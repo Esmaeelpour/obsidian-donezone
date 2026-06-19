@@ -205,6 +205,7 @@ export default class DoneZonePlugin extends Plugin {
 		if (this.isProcessing) return;
 
 		const content = editor.getValue();
+		const cursor = editor.getCursor();
 		const { main, completedItems: existing } = this.splitContent(content);
 
 		const completedRegex = /^([ \t]*[-*+] \[[xX]\] .+)\r?\n?/gm;
@@ -213,6 +214,14 @@ export default class DoneZonePlugin extends Plugin {
 		if (newItems.length === 0) {
 			if (!silent) new Notice("No completed items to move.");
 			return;
+		}
+
+		// Count [x] lines removed above the cursor so we can land on the right line
+		const singleItemRegex = /^[ \t]*[-*+] \[[xX]\] .+/;
+		const mainLines = main.split("\n");
+		let removedAbove = 0;
+		for (let i = 0; i < Math.min(cursor.line, mainLines.length); i++) {
+			if (singleItemRegex.test(mainLines[i])) removedAbove++;
 		}
 
 		const suffix = this.settings.dateStamp
@@ -236,7 +245,11 @@ export default class DoneZonePlugin extends Plugin {
 			: completedSection;
 
 		this.isProcessing = true;
-		this.setValuePreservingScroll(editor, newContent);
+		this.setValuePreservingScroll(
+			editor,
+			newContent,
+			Math.max(0, cursor.line - removedAbove)
+		);
 		this.isProcessing = false;
 	}
 
@@ -284,11 +297,20 @@ export default class DoneZonePlugin extends Plugin {
 		);
 	}
 
-	private setValuePreservingScroll(editor: Editor, content: string): void {
+	private setValuePreservingScroll(
+		editor: Editor,
+		content: string,
+		cursorLine?: number
+	): void {
 		const cm = (editor as any).cm;
 		const scrollTop = cm?.scrollDOM?.scrollTop ?? 0;
 		editor.setValue(content);
-		this.lastCursorLine = editor.getCursor().line;
+		const line = Math.min(
+			cursorLine ?? editor.getCursor().line,
+			editor.lineCount() - 1
+		);
+		editor.setCursor({ line, ch: editor.getLine(line).length });
+		this.lastCursorLine = line;
 		requestAnimationFrame(() => {
 			if (cm?.scrollDOM) cm.scrollDOM.scrollTop = scrollTop;
 		});
