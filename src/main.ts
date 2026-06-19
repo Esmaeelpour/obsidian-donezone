@@ -75,22 +75,25 @@ export default class DoneZonePlugin extends Plugin {
 	updateStatusBar(): void {
 		if (this.settings.showStatusBar && !this.statusBarEl) {
 			this.statusBarEl = this.addStatusBarItem();
-			this.statusBarEl.setText("✓ DoneZone");
 			this.statusBarEl.style.cursor = "pointer";
-			this.statusBarEl.title = "Run DoneZone";
-			this.statusBarEl.addEventListener("click", () => {
-				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!view) {
-					new Notice("No active markdown file.");
-					return;
-				}
-				this.returnUncheckedItems(view.editor);
-				this.moveCompletedItems(view.editor);
+			this.statusBarEl.title = "Toggle DoneZone auto-move";
+			this.statusBarEl.addEventListener("click", async () => {
+				this.settings.autoMove = !this.settings.autoMove;
+				await this.saveSettings();
+				this.refreshStatusBar();
 			});
+			this.refreshStatusBar();
 		} else if (!this.settings.showStatusBar && this.statusBarEl) {
 			this.statusBarEl.remove();
 			this.statusBarEl = null;
 		}
+	}
+
+	refreshStatusBar(): void {
+		if (!this.statusBarEl) return;
+		this.statusBarEl.setText(
+			this.settings.autoMove ? "DoneZone ●" : "DoneZone ○"
+		);
 	}
 
 	private setupAutoMove(): void {

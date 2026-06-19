@@ -60,8 +60,10 @@ export class CompletedAreaSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Show status bar button")
-			.setDesc("Add a clickable DoneZone button in the bottom status bar.")
+			.setName("Show status bar toggle")
+			.setDesc(
+				"Show a button in the bottom status bar that toggles auto-move on/off and displays its current state."
+			)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.showStatusBar)
@@ -83,6 +85,7 @@ export class CompletedAreaSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.autoMove = value;
 						await this.plugin.saveSettings();
+						this.plugin.refreshStatusBar();
 					})
 			);
 
