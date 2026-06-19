@@ -19,11 +19,11 @@ The sidebar ribbon runs a full pass: completed tasks move down, anything you un-
 
 #### Autocomplete tasks as you type
 
-Start typing in a checkbox and DoneZone suggests matching tasks from anywhere in the note — done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done — all in one keystroke.
+Start typing in a checkbox and DoneZone suggests matching tasks from anywhere in the note, done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done; all in one keystroke.
 
 #### Delete a task in one click
 
-Hover a checkbox line in the editor and a **×** appears on the right, just like Google Keep. Click it to remove that task — no selecting, no backspacing.
+Hover a checkbox line in the editor and a **×** appears on the right, just like Google Keep. Click it to remove that task; no selecting, no backspacing.
 
 #### Tidy up in bulk
 
@@ -34,7 +34,7 @@ Hover a checkbox line in the editor and a **×** appears on the right, just like
 
 - **Custom heading** — name the archive section and pick its level, H1 through H6
 - **Completion dates** — stamp each finished task with a date like `✅ 2026-06-19`, in any [Moment.js](https://momentjs.com/docs/#/displaying/format/) format
-- **Newest first or last** — add completed items to the top or bottom of the archive
+- **Newest first or last**  add completed items to the top or bottom of the archive
 - **Status bar toggle** — flip auto-move on or off and read its state (`✓` / `✗`) at a glance
 
 ---
