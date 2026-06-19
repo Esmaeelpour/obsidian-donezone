@@ -22,6 +22,7 @@ export default class DoneZonePlugin extends Plugin {
 
 	private isProcessing = false;
 	private autoMoveTimer: ReturnType<typeof setTimeout> | null = null;
+	private lastCursorLine = -1;
 
 	async onload() {
 		await this.loadSettings();
@@ -98,19 +99,46 @@ export default class DoneZonePlugin extends Plugin {
 
 	private setupAutoMove(): void {
 		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", () => {
+				this.lastCursorLine = -1;
+			})
+		);
+
+		this.registerEvent(
 			this.app.workspace.on("editor-change", () => {
 				if (this.isProcessing) return;
 
-				if (this.autoMoveTimer) clearTimeout(this.autoMoveTimer);
-				this.autoMoveTimer = setTimeout(() => {
-					const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-					if (!view) return;
-					const editor = view.editor;
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!view) return;
+				const editor = view.editor;
+				const currentLine = editor.getCursor().line;
+
+				const lineChanged =
+					this.lastCursorLine !== -1 &&
+					currentLine !== this.lastCursorLine;
+				this.lastCursorLine = currentLine;
+
+				if (this.autoMoveTimer) {
+					clearTimeout(this.autoMoveTimer);
+					this.autoMoveTimer = null;
+				}
+
+				if (lineChanged) {
 					this.returnUncheckedItems(editor);
 					if (this.settings.autoMove) {
 						this.moveCompletedItems(editor, true);
 					}
-				}, 500);
+				} else {
+					// Fallback for checkbox clicks where cursor doesn't move
+					this.autoMoveTimer = setTimeout(() => {
+						const v = this.app.workspace.getActiveViewOfType(MarkdownView);
+						if (!v || this.isProcessing) return;
+						this.returnUncheckedItems(v.editor);
+						if (this.settings.autoMove) {
+							this.moveCompletedItems(v.editor, true);
+						}
+					}, 2000);
+				}
 			})
 		);
 	}
@@ -276,6 +304,7 @@ export default class DoneZonePlugin extends Plugin {
 		const cm = (editor as any).cm;
 		const scrollTop = cm?.scrollDOM?.scrollTop ?? 0;
 		editor.setValue(content);
+		this.lastCursorLine = editor.getCursor().line;
 		requestAnimationFrame(() => {
 			if (cm?.scrollDOM) cm.scrollDOM.scrollTop = scrollTop;
 		});
