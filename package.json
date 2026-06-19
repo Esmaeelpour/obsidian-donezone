@@ -1,6 +1,6 @@
 {
   "name": "obsidian-donezone",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Move completed to-do items to a separate completed area.",
   "main": "main.js",
   "scripts": {
