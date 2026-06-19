@@ -115,20 +115,33 @@ export default class DoneZonePlugin extends Plugin {
 				const currentLine = editor.getCursor().line;
 				const content = editor.getValue();
 
-				const lineChanged =
-					this.lastCursorLine !== -1 &&
-					currentLine !== this.lastCursorLine;
+				const prevCursorLine = this.lastCursorLine;
+				const lineChanged = prevCursorLine !== -1 && currentLine !== prevCursorLine;
 				this.lastCursorLine = currentLine;
 
 				const snapshot = this.getCheckboxSnapshot(content);
 				const checkboxChanged = snapshot !== this.lastCheckboxSnapshot;
 				this.lastCheckboxSnapshot = snapshot;
 
-				if (lineChanged || checkboxChanged) {
-					this.returnUncheckedItems(editor);
-					if (this.settings.autoMove) {
-						this.moveCompletedItems(editor, true);
-					}
+				// Detect cursor leaving the completed section for the main section
+				const headerMatch = this.getHeaderRegex().exec(content);
+				const headerLine = headerMatch
+					? content.substring(0, headerMatch.index).split('\n').length - 1
+					: -1;
+				const exitedCompleted =
+					lineChanged &&
+					headerLine >= 0 &&
+					prevCursorLine > headerLine &&
+					currentLine <= headerLine;
+
+				// returnUncheckedItems fires on explicit checkbox toggle or on exit from completed.
+				// It does NOT fire on lineChanged within the completed section, avoiding cursor chaos
+				// when the user presses Enter or navigates inside that section.
+				if (exitedCompleted || checkboxChanged) {
+					this.returnUncheckedItems(editor, exitedCompleted);
+				}
+				if ((lineChanged || checkboxChanged) && this.settings.autoMove) {
+					this.moveCompletedItems(editor, true);
 				}
 			})
 		);
@@ -138,7 +151,9 @@ export default class DoneZonePlugin extends Plugin {
 		return (content.match(/^[ \t]*[-*+] \[[xX ]\]/gm) ?? []).join('');
 	}
 
-	private returnUncheckedItems(editor: Editor): void {
+	// cleanEmpty=true: also discard empty "- [ ] " continuation lines (called on exit from completed).
+	// cleanEmpty=false: only return items with real content (called on checkbox toggle).
+	private returnUncheckedItems(editor: Editor, cleanEmpty = false): void {
 		if (this.isProcessing) return;
 
 		const content = editor.getValue();
@@ -151,15 +166,16 @@ export default class DoneZonePlugin extends Plugin {
 		const rawAfterHeader = content.substring(match.index + match[0].length);
 		const afterHeader = rawAfterHeader.trimStart();
 
-		// .* also catches empty continuation lines created by pressing Enter
-		const uncheckedRegex = /^([ \t]*[-*+] \[ \] .*)\r?\n?/gm;
+		// With cleanEmpty, .* also catches empty "- [ ] " continuation lines.
+		const uncheckedRegex = cleanEmpty
+			? /^([ \t]*[-*+] \[ \] .*)\r?\n?/gm
+			: /^([ \t]*[-*+] \[ \] .+)\r?\n?/gm;
 		const uncheckedMatches = [...afterHeader.matchAll(uncheckedRegex)];
 
 		if (uncheckedMatches.length === 0) return;
 
 		const cleanedSection = afterHeader.replace(uncheckedRegex, "").trimEnd();
 
-		// Only return items with real content; empty continuation lines are discarded
 		const hasContent = /^[ \t]*[-*+] \[ \] \S/;
 		const returnedItems = uncheckedMatches
 			.filter((m) => hasContent.test(m[1]))
@@ -175,10 +191,9 @@ export default class DoneZonePlugin extends Plugin {
 			? `${newMain}\n\n${this.getHeaderStr()}\n${cleanedSection}`
 			: newMain;
 
-		// Cursor adjustment:
-		// - lines removed above cursor (in completed section) shift it up
-		// - lines added to main (returned items) shift the completed section down
-		// Goal: land on the line that was below the removed item(s), staying in completed.
+		// Cursor adjustment: start from pre-change cursor, subtract lines removed above it
+		// (in completed), add lines inserted into main before it (returned items, only relevant
+		// when cursor is already in completed and the section shifts down).
 		const preCursorLine = editor.getCursor().line;
 		const headerLine = content.substring(0, match.index).split("\n").length - 1;
 		const cursorInCompleted = preCursorLine > headerLine;
@@ -187,10 +202,14 @@ export default class DoneZonePlugin extends Plugin {
 		const afterHeaderDocLine =
 			content.substring(0, match.index + match[0].length + leadingTrim).split("\n").length - 1;
 
+		// Use the same predicate as uncheckedRegex so we only count actually-removed lines.
+		const removedPredicate = cleanEmpty
+			? /^[ \t]*[-*+] \[ \] /
+			: /^[ \t]*[-*+] \[ \] \S/;
 		const removedAboveCursor = afterHeader
 			.split("\n")
 			.slice(0, Math.max(0, preCursorLine - afterHeaderDocLine))
-			.filter((l) => /^[ \t]*[-*+] \[ \] /.test(l)).length;
+			.filter((l) => removedPredicate.test(l)).length;
 
 		const cursorLine = Math.max(
 			0,
