@@ -22,9 +22,15 @@ import {
 import { CheckSortedSettings, DEFAULT_SETTINGS } from "./settings";
 import { CheckSortedSettingTab } from "./settingsTab";
 
-const RIBBON_ICON = `<g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M22,40 L40,58 L78,20"></path>
-  <path d="M30,62 L50,82 L70,62"></path>
+const RIBBON_ICON = `<g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="24" y="22" width="52" height="48" rx="13"></rect>
+  <path d="M50 8 V20"></path>
+  <circle cx="50" cy="7" r="4" fill="currentColor" stroke="none"></circle>
+  <path d="M24 41 H17"></path>
+  <path d="M76 41 H83"></path>
+  <circle cx="39" cy="40" r="4.5" fill="currentColor" stroke="none"></circle>
+  <circle cx="61" cy="40" r="4.5" fill="currentColor" stroke="none"></circle>
+  <path d="M41 60 L47 67 L59 53"></path>
 </g>`;
 
 export default class CheckSortedPlugin extends Plugin {
