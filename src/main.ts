@@ -152,20 +152,26 @@ export default class DoneZonePlugin extends Plugin {
 			.substring(match.index + match[0].length)
 			.trimStart();
 
-		const uncheckedRegex = /^([ \t]*[-*+] \[ \] .+)\r?\n?/gm;
-		const uncheckedItems = [...afterHeader.matchAll(uncheckedRegex)].map(
-			(m) => m[1]
-		);
+		// Use .* to also catch empty continuation lines (e.g. "- [ ] " after pressing Enter)
+		const uncheckedRegex = /^([ \t]*[-*+] \[ \] .*)\r?\n?/gm;
+		const uncheckedMatches = [...afterHeader.matchAll(uncheckedRegex)];
 
-		if (uncheckedItems.length === 0) return;
+		if (uncheckedMatches.length === 0) return;
 
 		const cleanedSection = afterHeader.replace(uncheckedRegex, "").trimEnd();
-		const returnedItems = uncheckedItems.map((item) =>
-			item.replace(/\s*✅.*$/, "")
-		);
 
-		const returnedBlock = returnedItems.join("\n");
-		const newMain = main ? `${main}\n${returnedBlock}` : returnedBlock;
+		// Only return items that have real content; empty continuation lines are just discarded
+		const hasContent = /^[ \t]*[-*+] \[ \] \S/;
+		const returnedItems = uncheckedMatches
+			.filter((m) => hasContent.test(m[1]))
+			.map((m) => m[1].replace(/\s*✅.*$/, ""));
+
+		const newMain =
+			returnedItems.length > 0
+				? main
+					? `${main}\n${returnedItems.join("\n")}`
+					: returnedItems.join("\n")
+				: main;
 		const newContent = cleanedSection
 			? `${newMain}\n\n${this.getHeaderStr()}\n${cleanedSection}`
 			: newMain;
