@@ -464,7 +464,7 @@ export default class CheckSortedPlugin extends Plugin {
 		editor.setCursor({ line, ch: editor.getLine(line).length });
 		this.lastCursorLine = line;
 		this.lastCheckboxSnapshot = this.getCheckboxSnapshot(content);
-		activeWindow.requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			editor.scrollTo(scroll.left, scroll.top);
 		});
 	}
