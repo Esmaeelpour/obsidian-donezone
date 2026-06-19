@@ -1,10 +1,6 @@
 # CheckSorted
 
-An [Obsidian](https://obsidian.md) plugin that keeps your checkbox lists tidy — completed items move into a dedicated section at the bottom of your note, and typing, completing, and deleting tasks all get out of your way.
-
-![Obsidian minAppVersion](https://img.shields.io/badge/Obsidian-1.4%2B-7c3aed)
-![License](https://img.shields.io/badge/license-MIT-green)
-
+An [Obsidian](https://obsidian.md) plugin that keeps your checkbox lists tidy; completed items move into a dedicated section at the bottom of your note, and typing, completing, and deleting tasks all get out of your way.
 ---
 
 ## Features
