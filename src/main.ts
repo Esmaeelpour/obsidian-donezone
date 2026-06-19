@@ -176,8 +176,11 @@ export default class DoneZonePlugin extends Plugin {
 			? `${newMain}\n\n${this.getHeaderStr()}\n${cleanedSection}`
 			: newMain;
 
+		// Land cursor on the last returned item; if nothing returned, end of main
+		const cursorLine = Math.max(0, newMain.split("\n").length - 1);
+
 		this.isProcessing = true;
-		this.setValuePreservingScroll(editor, newContent);
+		this.setValuePreservingScroll(editor, newContent, cursorLine);
 		this.isProcessing = false;
 	}
 
