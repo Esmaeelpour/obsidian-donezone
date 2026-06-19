@@ -10,6 +10,15 @@ import {
 	Notice,
 	Plugin,
 } from "obsidian";
+import { RangeSetBuilder } from "@codemirror/state";
+import {
+	Decoration,
+	DecorationSet,
+	EditorView,
+	ViewPlugin,
+	ViewUpdate,
+	WidgetType,
+} from "@codemirror/view";
 import { CompletedAreaSettings, DEFAULT_SETTINGS } from "./settings";
 import { CompletedAreaSettingTab } from "./settingsTab";
 
@@ -60,8 +69,39 @@ export default class DoneZonePlugin extends Plugin {
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
 		this.registerEditorSuggest(new CheckboxSuggest(this));
+		this.registerEditorExtension(deleteButtonExtension(this));
+		this.injectStyles();
 		this.updateStatusBar();
 		this.setupAutoMove();
+	}
+
+	private injectStyles(): void {
+		const style = document.createElement("style");
+		style.id = "donezone-styles";
+		style.textContent = `
+.donezone-delete-task {
+	float: right;
+	margin-left: 8px;
+	padding: 0 4px;
+	color: var(--text-faint);
+	font-weight: bold;
+	line-height: 1;
+	border-radius: 4px;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 80ms ease;
+}
+.cm-line:hover .donezone-delete-task {
+	opacity: 0.6;
+}
+.donezone-delete-task:hover {
+	opacity: 1;
+	color: var(--text-on-accent);
+	background-color: var(--text-error);
+}
+`;
+		document.head.appendChild(style);
+		this.register(() => style.remove());
 	}
 
 	updateRibbonIcon(): void {
@@ -556,4 +596,83 @@ class CheckboxSuggest extends EditorSuggest<CheckboxSuggestion> {
 		);
 		this.close();
 	}
+}
+
+// A clickable "×" rendered at the end of a checkbox line that deletes that line.
+class DeleteTaskWidget extends WidgetType {
+	toDOM(view: EditorView): HTMLElement {
+		const btn = document.createElement("span");
+		btn.className = "donezone-delete-task";
+		btn.textContent = "×";
+		btn.setAttribute("aria-label", "Delete task");
+		btn.addEventListener("mousedown", (e) => {
+			// Stop the editor from moving the cursor / starting a selection.
+			e.preventDefault();
+			e.stopPropagation();
+			const pos = view.posAtDOM(btn);
+			const line = view.state.doc.lineAt(pos);
+			const isLast = line.to >= view.state.doc.length;
+			// Remove the line and one adjacent newline so no blank gap remains.
+			const from = isLast && line.from > 0 ? line.from - 1 : line.from;
+			const to = isLast ? line.to : line.to + 1;
+			view.dispatch({ changes: { from, to, insert: "" } });
+		});
+		return btn;
+	}
+
+	eq(): boolean {
+		return true;
+	}
+
+	ignoreEvent(): boolean {
+		return true;
+	}
+}
+
+// Editor extension that puts a DeleteTaskWidget at the end of every checkbox line.
+function deleteButtonExtension(plugin: DoneZonePlugin) {
+	const checkbox = /^\s*[-*+] \[[ xX]\]\s/;
+
+	return ViewPlugin.fromClass(
+		class {
+			decorations: DecorationSet;
+
+			constructor(view: EditorView) {
+				this.decorations = this.build(view);
+			}
+
+			update(update: ViewUpdate) {
+				if (update.docChanged || update.viewportChanged) {
+					this.decorations = this.build(update.view);
+				}
+			}
+
+			build(view: EditorView): DecorationSet {
+				const builder = new RangeSetBuilder<Decoration>();
+				if (!plugin.settings.showDeleteButton) return builder.finish();
+
+				for (const { from, to } of view.visibleRanges) {
+					let pos = from;
+					while (pos <= to) {
+						const line = view.state.doc.lineAt(pos);
+						if (checkbox.test(line.text)) {
+							builder.add(
+								line.to,
+								line.to,
+								Decoration.widget({
+									widget: new DeleteTaskWidget(),
+									side: 1,
+								})
+							);
+						}
+						pos = line.to + 1;
+					}
+				}
+				return builder.finish();
+			}
+		},
+		{
+			decorations: (v) => v.decorations,
+		}
+	);
 }

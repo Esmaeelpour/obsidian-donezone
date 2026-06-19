@@ -90,6 +90,21 @@ export class CompletedAreaSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Show delete button")
+			.setDesc(
+				"Show a × on the right of each checkbox line in the editor; click it to delete that task."
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.showDeleteButton)
+					.onChange(async (value) => {
+						this.plugin.settings.showDeleteButton = value;
+						await this.plugin.saveSettings();
+						this.app.workspace.updateOptions();
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Task autocomplete")
 			.setDesc(
 				"While typing in a checkbox, suggest matching tasks from elsewhere in the note. Selecting one moves that task to the line you are typing."
