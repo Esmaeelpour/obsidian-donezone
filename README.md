@@ -134,7 +134,7 @@ BRAT will also handle updates automatically.
 
 ## Credits
 
-Inspired by [obsidian-completed-area](https://github.com/DahaWong/obsidian-completed-area) by [DahaWong](https://github.com/DahaWong).
+CheckSorted is an independent plugin with its own implementation. Its core idea — moving completed tasks into a dedicated section — was inspired by [obsidian-completed-area](https://github.com/DahaWong/obsidian-completed-area) by [DahaWong](https://github.com/DahaWong). Thanks for the original concept!
 
 ---
 

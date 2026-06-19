@@ -1,4 +1,4 @@
-export interface CompletedAreaSettings {
+export interface CheckSortedSettings {
 	completedAreaHierarchy: string;
 	completedAreaName: string;
 	showIcon: boolean;
@@ -11,7 +11,7 @@ export interface CompletedAreaSettings {
 	sortOrder: "append" | "prepend";
 }
 
-export const DEFAULT_SETTINGS: CompletedAreaSettings = {
+export const DEFAULT_SETTINGS: CheckSortedSettings = {
 	completedAreaHierarchy: "2",
 	completedAreaName: "Completed",
 	showIcon: true,

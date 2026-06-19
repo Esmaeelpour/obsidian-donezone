@@ -1,7 +1,7 @@
 import { App, moment, PluginSettingTab, Setting } from "obsidian";
 import type CheckSortedPlugin from "./main";
 
-export class CompletedAreaSettingTab extends PluginSettingTab {
+export class CheckSortedSettingTab extends PluginSettingTab {
 	plugin: CheckSortedPlugin;
 
 	constructor(app: App, plugin: CheckSortedPlugin) {
