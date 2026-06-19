@@ -1,6 +1,6 @@
 # DoneZone
 
-An [Obsidian](https://obsidian.md) plugin that moves completed to-do items into a dedicated **Done Zone** section at the bottom of your note — keeping your active tasks clean and your completed ones archived in place.
+An [Obsidian](https://obsidian.md) plugin that moves completed to-do items into a dedicated **Done Zone** section at the bottom of your note; keeping your active tasks clean and your completed ones archived in place.
 
 ![Obsidian minAppVersion](https://img.shields.io/badge/Obsidian-1.4%2B-7c3aed)
 ![License](https://img.shields.io/badge/license-MIT-green)
