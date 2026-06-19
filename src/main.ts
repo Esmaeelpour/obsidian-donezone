@@ -22,7 +22,7 @@ export default class DoneZonePlugin extends Plugin {
 
 	private isProcessing = false;
 	private lastCursorLine = -1;
-	private lastLineContent = '';
+	private lastCheckboxSnapshot = '';
 
 	async onload() {
 		await this.loadSettings();
@@ -101,7 +101,7 @@ export default class DoneZonePlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", () => {
 				this.lastCursorLine = -1;
-				this.lastLineContent = '';
+				this.lastCheckboxSnapshot = '';
 			})
 		);
 
@@ -113,21 +113,18 @@ export default class DoneZonePlugin extends Plugin {
 				if (!view) return;
 				const editor = view.editor;
 				const currentLine = editor.getCursor().line;
-				const currentLineContent = editor.getLine(currentLine);
+				const content = editor.getValue();
 
 				const lineChanged =
 					this.lastCursorLine !== -1 &&
 					currentLine !== this.lastCursorLine;
-
-				const checkboxToggled =
-					!lineChanged &&
-					this.lastCursorLine !== -1 &&
-					this.isCheckboxToggle(this.lastLineContent, currentLineContent);
-
 				this.lastCursorLine = currentLine;
-				this.lastLineContent = currentLineContent;
 
-				if (lineChanged || checkboxToggled) {
+				const snapshot = this.getCheckboxSnapshot(content);
+				const checkboxChanged = snapshot !== this.lastCheckboxSnapshot;
+				this.lastCheckboxSnapshot = snapshot;
+
+				if (lineChanged || checkboxChanged) {
 					this.returnUncheckedItems(editor);
 					if (this.settings.autoMove) {
 						this.moveCompletedItems(editor, true);
@@ -137,13 +134,8 @@ export default class DoneZonePlugin extends Plugin {
 		);
 	}
 
-	private isCheckboxToggle(before: string, after: string): boolean {
-		const unchecked = /^[ \t]*[-*+] \[ \] /;
-		const checked = /^[ \t]*[-*+] \[[xX]\] /;
-		return (
-			(unchecked.test(before) && checked.test(after)) ||
-			(checked.test(before) && unchecked.test(after))
-		);
+	private getCheckboxSnapshot(content: string): string {
+		return (content.match(/^[ \t]*[-*+] \[[xX ]\]/gm) ?? []).join('');
 	}
 
 	private returnUncheckedItems(editor: Editor): void {
@@ -330,7 +322,7 @@ export default class DoneZonePlugin extends Plugin {
 		);
 		editor.setCursor({ line, ch: editor.getLine(line).length });
 		this.lastCursorLine = line;
-		this.lastLineContent = editor.getLine(line);
+		this.lastCheckboxSnapshot = this.getCheckboxSnapshot(content);
 		requestAnimationFrame(() => {
 			if (cm?.scrollDOM) cm.scrollDOM.scrollTop = scrollTop;
 		});
