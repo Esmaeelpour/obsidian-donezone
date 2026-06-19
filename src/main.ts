@@ -61,6 +61,9 @@ export default class DoneZonePlugin extends Plugin {
 					const view =
 						this.app.workspace.getActiveViewOfType(MarkdownView);
 					if (view) {
+						// Full sync: return unchecked items out of the completed
+						// area, then move newly completed items into it.
+						this.returnUncheckedItems(view.editor, true);
 						this.moveCompletedItems(view.editor);
 					} else {
 						new Notice("No active markdown file.");
