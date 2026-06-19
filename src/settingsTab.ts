@@ -1,10 +1,10 @@
 import { App, moment, PluginSettingTab, Setting } from "obsidian";
-import type DoneZonePlugin from "./main";
+import type CheckSortedPlugin from "./main";
 
 export class CompletedAreaSettingTab extends PluginSettingTab {
-	plugin: DoneZonePlugin;
+	plugin: CheckSortedPlugin;
 
-	constructor(app: App, plugin: DoneZonePlugin) {
+	constructor(app: App, plugin: CheckSortedPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

@@ -35,7 +35,7 @@ const RIBBON_ICON = `<g stroke="none" stroke-width="1" fill="none" fill-rule="ev
     68.7153857,33.5033079 Z" fill="currentColor" fill-rule="nonzero"></path>
 </g>`;
 
-export default class DoneZonePlugin extends Plugin {
+export default class CheckSortedPlugin extends Plugin {
 	settings: CompletedAreaSettings;
 	ribbonIconEl: HTMLElement | null = null;
 	statusBarEl: HTMLElement | null = null;
@@ -46,7 +46,7 @@ export default class DoneZonePlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		addIcon("donezone", RIBBON_ICON);
+		addIcon("checksorted", RIBBON_ICON);
 		this.updateRibbonIcon();
 
 		this.addCommand({
@@ -77,8 +77,8 @@ export default class DoneZonePlugin extends Plugin {
 	updateRibbonIcon(): void {
 		if (this.settings.showIcon && !this.ribbonIconEl) {
 			this.ribbonIconEl = this.addRibbonIcon(
-				"donezone",
-				"DoneZone: move completed items",
+				"checksorted",
+				"CheckSorted: move completed items",
 				() => {
 					const view =
 						this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -101,8 +101,8 @@ export default class DoneZonePlugin extends Plugin {
 	updateStatusBar(): void {
 		if (this.settings.showStatusBar && !this.statusBarEl) {
 			this.statusBarEl = this.addStatusBarItem();
-			this.statusBarEl.addClass("donezone-status-bar");
-			this.statusBarEl.setAttribute("aria-label", "Toggle DoneZone auto-move");
+			this.statusBarEl.addClass("checksorted-status-bar");
+			this.statusBarEl.setAttribute("aria-label", "Toggle CheckSorted auto-move");
 			this.registerDomEvent(this.statusBarEl, "click", async () => {
 				this.settings.autoMove = !this.settings.autoMove;
 				await this.saveSettings();
@@ -118,7 +118,7 @@ export default class DoneZonePlugin extends Plugin {
 	refreshStatusBar(): void {
 		if (!this.statusBarEl) return;
 		this.statusBarEl.setText(
-			this.settings.autoMove ? "DoneZone ✓" : "DoneZone ✗"
+			this.settings.autoMove ? "CheckSorted ✓" : "CheckSorted ✗"
 		);
 	}
 
@@ -488,11 +488,11 @@ interface CheckboxSuggestion {
 // Autocomplete for checkbox tasks: while typing in a checkbox, suggest tasks
 // from elsewhere in the note whose text starts with what you've typed. Accepting
 // a suggestion moves that task onto the line being typed (see
-// DoneZonePlugin.applyCheckboxSuggestion).
+// CheckSortedPlugin.applyCheckboxSuggestion).
 class CheckboxSuggest extends EditorSuggest<CheckboxSuggestion> {
-	private plugin: DoneZonePlugin;
+	private plugin: CheckSortedPlugin;
 
-	constructor(plugin: DoneZonePlugin) {
+	constructor(plugin: CheckSortedPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
 	}
@@ -551,7 +551,7 @@ class CheckboxSuggest extends EditorSuggest<CheckboxSuggestion> {
 
 	renderSuggestion(item: CheckboxSuggestion, el: HTMLElement): void {
 		el.createSpan({
-			cls: "donezone-suggest-state",
+			cls: "checksorted-suggest-state",
 			text: item.checked ? "☑" : "☐",
 		});
 		el.createSpan({ text: item.text });
@@ -573,7 +573,7 @@ class CheckboxSuggest extends EditorSuggest<CheckboxSuggestion> {
 class DeleteTaskWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
 		const btn = createSpan({
-			cls: "donezone-delete-task",
+			cls: "checksorted-delete-task",
 			text: "×",
 			attr: { "aria-label": "Delete task" },
 		});
@@ -602,7 +602,7 @@ class DeleteTaskWidget extends WidgetType {
 }
 
 // Editor extension that puts a DeleteTaskWidget at the end of every checkbox line.
-function deleteButtonExtension(plugin: DoneZonePlugin) {
+function deleteButtonExtension(plugin: CheckSortedPlugin) {
 	const checkbox = /^\s*[-*+] \[[ xX]\]\s/;
 
 	return ViewPlugin.fromClass(

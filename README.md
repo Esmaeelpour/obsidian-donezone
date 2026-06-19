@@ -1,6 +1,6 @@
-# DoneZone
+# CheckSorted
 
-An [Obsidian](https://obsidian.md) plugin that moves completed to-do items into a dedicated **Done Zone** section at the bottom of your note; keeping your active tasks clean and your completed ones archived in place.
+An [Obsidian](https://obsidian.md) plugin that keeps your checkbox lists tidy — completed items move into a dedicated section at the bottom of your note, and typing, completing, and deleting tasks all get out of your way.
 
 ![Obsidian minAppVersion](https://img.shields.io/badge/Obsidian-1.4%2B-7c3aed)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -19,7 +19,7 @@ The sidebar ribbon runs a full pass: completed tasks move down, anything you un-
 
 #### Autocomplete tasks as you type
 
-Start typing in a checkbox and DoneZone suggests matching tasks from anywhere in the note, done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done; all in one keystroke.
+Start typing in a checkbox and CheckSorted suggests matching tasks from anywhere in the note, done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done; all in one keystroke.
 
 #### Delete a task in one click
 
@@ -55,7 +55,7 @@ You can assign custom hotkeys to any of these in **Settings → Hotkeys**.
 
 ### Ribbon icon
 
-Clicking the DoneZone ribbon icon in the left sidebar runs a **full sync** in one step:
+Clicking the CheckSorted ribbon icon in the left sidebar runs a **full sync** in one step:
 
 1. Any unchecked `- [ ]` items left in the completed area are returned to the main list (and stray empty checkboxes are cleared).
 2. All checked `- [x]` items in the note body are moved into the completed area.
@@ -93,7 +93,7 @@ Unchecking an item in the completed area automatically returns it to the main li
 | Header level | H2 | Heading level for the completed section |
 | Header name | `Completed` | Text of the completed section heading |
 | Show ribbon icon | On | Display the trigger icon in the left sidebar |
-| Show status bar toggle | Off | Show `DoneZone ✓ / ✗` in the bottom status bar — click to toggle auto-move |
+| Show status bar toggle | Off | Show `CheckSorted ✓ / ✗` in the bottom status bar — click to toggle auto-move |
 | Auto-move on complete | Off | Automatically move items to the completed area when checked |
 | Show delete button | On | Show a × on the right of each checkbox line in the editor; click it to delete that task |
 | Task autocomplete | On | Suggest matching tasks while typing in a checkbox; selecting one moves it to the line you're typing |
@@ -107,10 +107,10 @@ Unchecking an item in the completed area automatically returns it to the main li
 
 ### From Community Plugins
 
-Once approved, DoneZone will be installable directly from Obsidian:
+Once approved, CheckSorted will be installable directly from Obsidian:
 
 1. Open **Settings → Community Plugins** and click **Browse**
-2. Search for **DoneZone**
+2. Search for **CheckSorted**
 3. Click **Install**, then **Enable**
 
 ### Using BRAT
@@ -119,16 +119,16 @@ Once approved, DoneZone will be installable directly from Obsidian:
 
 1. Install **BRAT** from the Obsidian community plugins
 2. Open BRAT settings and click **Add Beta Plugin**
-3. Paste this URL: `https://github.com/Esmaeelpour/obsidian-donezone`
-4. Enable **DoneZone** in **Settings → Community Plugins**
+3. Paste this URL: `https://github.com/Esmaeelpour/obsidian-checksorted`
+4. Enable **CheckSorted** in **Settings → Community Plugins**
 
 BRAT will also handle updates automatically.
 
 ### Manual
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Esmaeelpour/obsidian-donezone/releases)
-2. Copy all three files into your vault at `.obsidian/plugins/donezone/`
-3. Reload Obsidian and enable **DoneZone** in **Settings → Community Plugins**
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/Esmaeelpour/obsidian-checksorted/releases)
+2. Copy all three files into your vault at `.obsidian/plugins/checksorted/`
+3. Reload Obsidian and enable **CheckSorted** in **Settings → Community Plugins**
 
 ---
 

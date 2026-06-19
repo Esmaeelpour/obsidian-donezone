@@ -1,9 +1,9 @@
 {
-	"id": "donezone",
-	"name": "DoneZone",
-	"version": "1.0.23",
+	"id": "checksorted",
+	"name": "CheckSorted",
+	"version": "1.0.24",
 	"minAppVersion": "1.4.0",
-	"description": "Move completed to-do items into a separate done area, keeping your active tasks clean.",
+	"description": "Keep checkbox lists tidy: move completed items into a separate section, autocomplete tasks, and delete them in one click.",
 	"author": "Javad Esmaeelpour",
 	"authorUrl": "https://github.com/Esmaeelpour",
 	"isDesktopOnly": false

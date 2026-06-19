@@ -1,5 +1,5 @@
 /* Click-to-delete button on checkbox lines (Google Keep style) */
-.donezone-delete-task {
+.checksorted-delete-task {
 	float: right;
 	margin-left: 8px;
 	padding: 0 4px;
@@ -12,23 +12,23 @@
 	transition: opacity 80ms ease;
 }
 
-.cm-line:hover .donezone-delete-task {
+.cm-line:hover .checksorted-delete-task {
 	opacity: 0.6;
 }
 
-.donezone-delete-task:hover {
+.checksorted-delete-task:hover {
 	opacity: 1;
 	color: var(--text-on-accent);
 	background-color: var(--text-error);
 }
 
 /* Task autocomplete suggestion */
-.donezone-suggest-state {
+.checksorted-suggest-state {
 	opacity: 0.6;
 	margin-right: 0.4em;
 }
 
 /* Status bar toggle */
-.donezone-status-bar {
+.checksorted-status-bar {
 	cursor: pointer;
 }
