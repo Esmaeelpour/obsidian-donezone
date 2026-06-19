@@ -60,6 +60,19 @@ export class CompletedAreaSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Show status bar button")
+			.setDesc("Add a clickable DoneZone button in the bottom status bar.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.showStatusBar)
+					.onChange(async (value) => {
+						this.plugin.settings.showStatusBar = value;
+						await this.plugin.saveSettings();
+						this.plugin.updateStatusBar();
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Auto-move on complete")
 			.setDesc(
 				"Automatically move items to the completed area when a checkbox is checked."

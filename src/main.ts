@@ -18,6 +18,7 @@ const RIBBON_ICON = `<g stroke="none" stroke-width="1" fill="none" fill-rule="ev
 export default class DoneZonePlugin extends Plugin {
 	settings: CompletedAreaSettings;
 	ribbonIconEl: HTMLElement | null = null;
+	statusBarEl: HTMLElement | null = null;
 
 	private isProcessing = false;
 	private autoMoveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -46,6 +47,7 @@ export default class DoneZonePlugin extends Plugin {
 		});
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
+		this.updateStatusBar();
 		this.setupAutoMove();
 	}
 
@@ -67,6 +69,27 @@ export default class DoneZonePlugin extends Plugin {
 		} else if (!this.settings.showIcon && this.ribbonIconEl) {
 			this.ribbonIconEl.remove();
 			this.ribbonIconEl = null;
+		}
+	}
+
+	updateStatusBar(): void {
+		if (this.settings.showStatusBar && !this.statusBarEl) {
+			this.statusBarEl = this.addStatusBarItem();
+			this.statusBarEl.setText("✓ DoneZone");
+			this.statusBarEl.style.cursor = "pointer";
+			this.statusBarEl.title = "Run DoneZone";
+			this.statusBarEl.addEventListener("click", () => {
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!view) {
+					new Notice("No active markdown file.");
+					return;
+				}
+				this.returnUncheckedItems(view.editor);
+				this.moveCompletedItems(view.editor);
+			});
+		} else if (!this.settings.showStatusBar && this.statusBarEl) {
+			this.statusBarEl.remove();
+			this.statusBarEl = null;
 		}
 	}
 
