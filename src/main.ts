@@ -367,9 +367,26 @@ export default class DoneZonePlugin extends Plugin {
 		// Removing a line above the target shifts the target up by one.
 		const finalLine = sourceLine < targetLine ? targetLine - 1 : targetLine;
 
+		// Pulling the source out may leave the completed area empty; if so, drop
+		// its now-orphaned header. This only ever trims content below the target
+		// line, so finalLine stays valid.
+		const newContent = this.dropEmptyCompletedSection(lines.join("\n"));
+
 		this.isProcessing = true;
-		this.setValuePreservingScroll(editor, lines.join("\n"), finalLine);
+		this.setValuePreservingScroll(editor, newContent, finalLine);
 		this.isProcessing = false;
+	}
+
+	// If the completed area has no content left under its header, remove the
+	// header (and any trailing whitespace) so no empty section lingers.
+	private dropEmptyCompletedSection(content: string): string {
+		const match = this.getHeaderRegex().exec(content);
+		if (!match) return content;
+
+		const afterHeader = content.substring(match.index + match[0].length);
+		if (afterHeader.trim() !== "") return content;
+
+		return content.substring(0, match.index).trimEnd();
 	}
 
 	restoreCompletedItems(editor: Editor): void {
