@@ -4,6 +4,7 @@ export interface CompletedAreaSettings {
 	showIcon: boolean;
 	showStatusBar: boolean;
 	autoMove: boolean;
+	autocomplete: boolean;
 	dateStamp: boolean;
 	dateFormat: string;
 	sortOrder: "append" | "prepend";
@@ -15,6 +16,7 @@ export const DEFAULT_SETTINGS: CompletedAreaSettings = {
 	showIcon: true,
 	showStatusBar: false,
 	autoMove: false,
+	autocomplete: true,
 	dateStamp: false,
 	dateFormat: "YYYY-MM-DD",
 	sortOrder: "append",

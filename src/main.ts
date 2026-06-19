@@ -1,4 +1,15 @@
-import { addIcon, Editor, MarkdownView, moment, Notice, Plugin } from "obsidian";
+import {
+	addIcon,
+	Editor,
+	EditorPosition,
+	EditorSuggest,
+	EditorSuggestContext,
+	EditorSuggestTriggerInfo,
+	MarkdownView,
+	moment,
+	Notice,
+	Plugin,
+} from "obsidian";
 import { CompletedAreaSettings, DEFAULT_SETTINGS } from "./settings";
 import { CompletedAreaSettingTab } from "./settingsTab";
 
@@ -48,6 +59,7 @@ export default class DoneZonePlugin extends Plugin {
 		});
 
 		this.addSettingTab(new CompletedAreaSettingTab(this.app, this));
+		this.registerEditorSuggest(new CheckboxSuggest(this));
 		this.updateStatusBar();
 		this.setupAutoMove();
 	}
@@ -322,6 +334,44 @@ export default class DoneZonePlugin extends Plugin {
 		this.isProcessing = false;
 	}
 
+	// Called by CheckboxSuggest when an autocomplete suggestion is accepted.
+	// Rebuilds the line being typed with its own checkbox state and the chosen
+	// task text, then deletes the original occurrence. If the source item had a
+	// different state, this effectively changes its state to the typing line's.
+	applyCheckboxSuggestion(
+		editor: Editor,
+		sourceLine: number,
+		targetLine: number,
+		text: string
+	): void {
+		if (this.isProcessing) return;
+
+		const lines = editor.getValue().split("\n");
+		if (
+			sourceLine < 0 ||
+			sourceLine >= lines.length ||
+			targetLine < 0 ||
+			targetLine >= lines.length ||
+			sourceLine === targetLine
+		) {
+			return;
+		}
+
+		// m[0] is the "<indent>- [<state>] " prefix of the line being typed.
+		const prefix = /^\s*[-*+] \[[ xX]\] /.exec(lines[targetLine]);
+		if (!prefix) return;
+
+		lines[targetLine] = `${prefix[0]}${text}`;
+		lines.splice(sourceLine, 1);
+
+		// Removing a line above the target shifts the target up by one.
+		const finalLine = sourceLine < targetLine ? targetLine - 1 : targetLine;
+
+		this.isProcessing = true;
+		this.setValuePreservingScroll(editor, lines.join("\n"), finalLine);
+		this.isProcessing = false;
+	}
+
 	restoreCompletedItems(editor: Editor): void {
 		const content = editor.getValue();
 		const { main, completedItems } = this.splitContent(content);
@@ -401,4 +451,92 @@ export default class DoneZonePlugin extends Plugin {
 
 function escapeRegex(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+interface CheckboxSuggestion {
+	text: string;
+	checked: boolean;
+	line: number;
+}
+
+// Autocomplete for checkbox tasks: while typing in a checkbox, suggest tasks
+// from elsewhere in the note whose text starts with what you've typed. Accepting
+// a suggestion moves that task onto the line being typed (see
+// DoneZonePlugin.applyCheckboxSuggestion).
+class CheckboxSuggest extends EditorSuggest<CheckboxSuggestion> {
+	private plugin: DoneZonePlugin;
+
+	constructor(plugin: DoneZonePlugin) {
+		super(plugin.app);
+		this.plugin = plugin;
+	}
+
+	onTrigger(
+		cursor: EditorPosition,
+		editor: Editor
+	): EditorSuggestTriggerInfo | null {
+		if (!this.plugin.settings.autocomplete) return null;
+
+		const line = editor.getLine(cursor.line);
+		const prefix = /^\s*[-*+] \[[ xX]\] /.exec(line);
+		if (!prefix) return null;
+
+		const textStart = prefix[0].length;
+		if (cursor.ch < textStart) return null;
+
+		const query = line.substring(textStart, cursor.ch);
+		if (query.trim().length === 0) return null;
+
+		return {
+			start: { line: cursor.line, ch: textStart },
+			end: cursor,
+			query,
+		};
+	}
+
+	getSuggestions(context: EditorSuggestContext): CheckboxSuggestion[] {
+		const query = context.query.toLowerCase();
+		const currentLine = context.start.line;
+		const lines = context.editor.getValue().split("\n");
+		const itemRegex = /^\s*[-*+] \[([ xX])\] (.*)$/;
+
+		const seen = new Set<string>();
+		const results: CheckboxSuggestion[] = [];
+
+		for (let i = 0; i < lines.length && results.length < 8; i++) {
+			if (i === currentLine) continue;
+			const m = itemRegex.exec(lines[i]);
+			if (!m) continue;
+
+			// Match on the task text only, ignoring any "✅ <date>" stamp.
+			const text = m[2].replace(/\s*✅.*$/, "").trim();
+			if (!text || !text.toLowerCase().startsWith(query)) continue;
+
+			const checked = m[1] !== " ";
+			const key = `${checked ? "1" : "0"}:${text.toLowerCase()}`;
+			if (seen.has(key)) continue;
+			seen.add(key);
+
+			results.push({ text, checked, line: i });
+		}
+
+		return results;
+	}
+
+	renderSuggestion(item: CheckboxSuggestion, el: HTMLElement): void {
+		const box = el.createSpan({ text: item.checked ? "☑ " : "☐ " });
+		box.style.opacity = "0.6";
+		el.createSpan({ text: item.text });
+	}
+
+	selectSuggestion(item: CheckboxSuggestion): void {
+		if (!this.context) return;
+		this.plugin.applyCheckboxSuggestion(
+			this.context.editor,
+			item.line,
+			this.context.start.line,
+			item.text
+		);
+		this.close();
+	}
 }

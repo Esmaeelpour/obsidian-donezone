@@ -90,6 +90,20 @@ export class CompletedAreaSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Task autocomplete")
+			.setDesc(
+				"While typing in a checkbox, suggest matching tasks from elsewhere in the note. Selecting one moves that task to the line you are typing."
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.autocomplete)
+					.onChange(async (value) => {
+						this.plugin.settings.autocomplete = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Date stamp")
 			.setDesc("Append a completion date when items are moved.")
 			.addToggle((toggle) =>

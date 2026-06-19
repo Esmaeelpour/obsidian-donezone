@@ -17,6 +17,10 @@ Check a task and it slips into a **Completed** section at the foot of your note.
 
 The sidebar ribbon runs a full pass: completed tasks move down, anything you un-ticked moves back up, and leftover empty checkboxes are swept away; so neither list ever drifts out of sync.
 
+#### Autocomplete tasks as you type
+
+Start typing in a checkbox and DoneZone suggests matching tasks from anywhere in the note — done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done — all in one keystroke.
+
 #### Tidy up in bulk
 
 - **Restore all** — pull every archived task back into the active list at once
@@ -87,6 +91,7 @@ Unchecking an item in the completed area automatically returns it to the main li
 | Show ribbon icon | On | Display the trigger icon in the left sidebar |
 | Show status bar toggle | Off | Show `DoneZone ✓ / ✗` in the bottom status bar — click to toggle auto-move |
 | Auto-move on complete | Off | Automatically move items to the completed area when checked |
+| Task autocomplete | On | Suggest matching tasks while typing in a checkbox; selecting one moves it to the line you're typing |
 | Date stamp | Off | Append `✅ <date>` when items are moved |
 | Date format | `YYYY-MM-DD` | [Moment.js](https://momentjs.com/docs/#/displaying/format/) format for the stamp |
 | New items order | Append | Add new completed items at the bottom or top of the section |
