@@ -1,6 +1,6 @@
 {
   "name": "obsidian-checksorted",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Move completed to-do items to a separate completed area.",
   "main": "main.js",
   "scripts": {
