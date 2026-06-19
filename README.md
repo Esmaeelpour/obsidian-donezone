@@ -9,16 +9,24 @@ An [Obsidian](https://obsidian.md) plugin that moves completed to-do items into 
 
 ## Features
 
-- **Move completed items** — sends all checked `- [x]` tasks to the completed area
-- **Auto-return** — unchecking an item in the completed area sends it back automatically
-- **Restore items** — uncheck and return all completed items at once via command
-- **Clear completed area** — permanently removes all completed items and the section header
-- **Auto-move** — optionally move items the moment they are checked
-- **Status bar toggle** — shows auto-move state (`✓` / `✗`) and toggles it on click
-- **Date stamping** — appends a completion date (e.g. `✅ 2026-06-19`) when items are moved
-- **Sort order** — append new items to the bottom or prepend to the top of the completed area
-- **Configurable header** — set the heading level (H1–H6) and name of the completed section
-- **Ribbon icon** — one-click full sync from the left sidebar: returns unchecked items out of the completed area, then moves newly completed ones into it (can be hidden)
+**Organize your tasks**
+
+- **Move completed** — collects every checked `- [x]` task into a dedicated completed area at the bottom of the note
+- **Auto-return** — unchecking an item in the completed area sends it straight back to your active list
+- **Restore all** — uncheck and return every completed item in one command
+- **Clear** — remove all completed items and the section header in a single step
+
+**Hands-free automation**
+
+- **Auto-move on complete** — items jump to the completed area the moment you check them
+- **Ribbon full sync** — one click returns stray unchecked items *and* moves newly completed ones, keeping both lists tidy
+- **Status bar toggle** — see auto-move state at a glance (`✓` / `✗`) and flip it with a click
+
+**Make it yours**
+
+- **Configurable header** — choose the heading level (H1–H6) and name of the completed section
+- **Date stamping** — append a completion date such as `✅ 2026-06-19`, in any [Moment.js](https://momentjs.com/docs/#/displaying/format/) format
+- **Sort order** — add newly completed items to the bottom or the top of the section
 
 ---
 
