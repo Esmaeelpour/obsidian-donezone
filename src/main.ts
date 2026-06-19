@@ -148,7 +148,7 @@ export default class DoneZonePlugin extends Plugin {
 			: newMain;
 
 		this.isProcessing = true;
-		editor.setValue(newContent);
+		this.setValuePreservingScroll(editor, newContent);
 		this.isProcessing = false;
 	}
 
@@ -224,7 +224,7 @@ export default class DoneZonePlugin extends Plugin {
 			: completedSection;
 
 		this.isProcessing = true;
-		editor.setValue(newContent);
+		this.setValuePreservingScroll(editor, newContent);
 		this.isProcessing = false;
 	}
 
@@ -242,7 +242,7 @@ export default class DoneZonePlugin extends Plugin {
 		);
 
 		this.isProcessing = true;
-		editor.setValue(`${main}\n${restored.join("\n")}`.trim());
+		this.setValuePreservingScroll(editor, `${main}\n${restored.join("\n")}`.trim());
 		this.isProcessing = false;
 
 		new Notice(
@@ -262,7 +262,7 @@ export default class DoneZonePlugin extends Plugin {
 		}
 
 		this.isProcessing = true;
-		editor.setValue(main.trimEnd());
+		this.setValuePreservingScroll(editor, main.trimEnd());
 		this.isProcessing = false;
 
 		new Notice(
@@ -270,6 +270,15 @@ export default class DoneZonePlugin extends Plugin {
 				completedItems.length !== 1 ? "s" : ""
 			}.`
 		);
+	}
+
+	private setValuePreservingScroll(editor: Editor, content: string): void {
+		const cm = (editor as any).cm;
+		const scrollTop = cm?.scrollDOM?.scrollTop ?? 0;
+		editor.setValue(content);
+		requestAnimationFrame(() => {
+			if (cm?.scrollDOM) cm.scrollDOM.scrollTop = scrollTop;
+		});
 	}
 
 	async loadSettings() {
