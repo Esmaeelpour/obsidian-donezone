@@ -1,7 +1,7 @@
 {
 	"id": "donezone",
 	"name": "DoneZone",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"minAppVersion": "1.4.0",
 	"description": "Move completed to-do items into a separate done area, keeping your active tasks clean.",
 	"author": "Javad Esmaeelpour",
