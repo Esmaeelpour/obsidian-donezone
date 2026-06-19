@@ -2,12 +2,16 @@
 
 An [Obsidian](https://obsidian.md) plugin that keeps your checkbox lists tidy; completed items move into a dedicated section at the bottom of your note, and typing, completing, and deleting tasks all get out of your way.
 
+![CheckSorted](docs/img/hero.png)
+
 
 ## Features
 
 #### Move tasks where they belong
 
 Check a task and it slips into a **Completed** section at the foot of your note. Do it on demand from the command palette or ribbon, or turn on **auto-move** and watch each task leave the instant you tick it. Uncheck something by mistake? It quietly returns to your active list on its own.
+
+![Completed tasks moved into their own section](docs/img/move.png)
 
 #### Sync both ways in one click
 
@@ -17,9 +21,13 @@ The sidebar ribbon runs a full pass: completed tasks move down, anything you un-
 
 Start typing in a checkbox and CheckSorted suggests matching tasks from anywhere in the note, done or not. Pick one and that task hops onto the line you're typing, with its original copy removed, so duplicates collapse into a single entry. The task lands in the state of the line you're typing: type into an unchecked box and an archived task comes back active; type into a checked box and an open task is marked done; all in one keystroke.
 
+![Task autocomplete suggesting matching checkboxes](docs/img/autocomplete.png)
+
 #### Delete a task in one click
 
 Hover a checkbox line in the editor and a **×** appears on the right, just like Google Keep. Click it to remove that task; no selecting, no backspacing.
+
+![Click-to-delete button on a checkbox line](docs/img/delete.png)
 
 #### Tidy up in bulk
 
