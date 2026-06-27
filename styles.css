@@ -32,3 +32,85 @@
 .checksorted-status-bar {
 	cursor: pointer;
 }
+
+/* Date stamp after ✅ — cancel the strikethrough inherited from [x] items */
+.checksorted-date {
+	text-decoration: none !important;
+}
+
+/* Settings tab bar */
+.checksorted-tab-bar {
+	display: flex;
+	gap: 4px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	margin-bottom: 16px;
+	padding-bottom: 0;
+}
+
+.checksorted-tab-btn {
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	border-radius: 0;
+	color: var(--text-muted);
+	cursor: pointer;
+	font-size: var(--font-ui-small);
+	padding: 6px 14px;
+	margin-bottom: -1px;
+	transition: color 100ms ease, border-color 100ms ease;
+}
+
+.checksorted-tab-btn:hover {
+	color: var(--text-normal);
+}
+
+.checksorted-tab-btn.is-active {
+	border-bottom-color: var(--interactive-accent);
+	color: var(--text-normal);
+	font-weight: 600;
+}
+
+/* Collapsible sections */
+.checksorted-section {
+	margin-bottom: 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.checksorted-section-title {
+	background: var(--background-secondary);
+	cursor: pointer;
+	font-size: var(--font-ui-small);
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	list-style: none;
+	padding: 8px 14px;
+	text-transform: uppercase;
+	user-select: none;
+}
+
+.checksorted-section-title::-webkit-details-marker {
+	display: none;
+}
+
+.checksorted-section-title::after {
+	content: "›";
+	float: right;
+	font-size: 1.1em;
+	transition: transform 150ms ease;
+}
+
+.checksorted-section[open] .checksorted-section-title::after {
+	transform: rotate(90deg);
+}
+
+.checksorted-section .setting-item {
+	border-top: 1px solid var(--background-modifier-border);
+	padding-left: 14px;
+	padding-right: 14px;
+}
+
+.checksorted-section .setting-item:first-of-type {
+	border-top: 1px solid var(--background-modifier-border);
+}

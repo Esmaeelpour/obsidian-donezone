@@ -77,6 +77,23 @@ export default class CheckSortedPlugin extends Plugin {
 		this.addSettingTab(new CheckSortedSettingTab(this.app, this));
 		this.registerEditorSuggest(new CheckboxSuggest(this));
 		this.registerEditorExtension(deleteButtonExtension(this));
+		this.registerEditorExtension(dateStampExtension(this));
+		this.registerMarkdownPostProcessor((el) => {
+			el.querySelectorAll("li.task-list-item.is-checked").forEach((li) => {
+				li.childNodes.forEach((node) => {
+					if (node.nodeType !== Node.TEXT_NODE) return;
+					const text = node.textContent ?? "";
+					const idx = text.indexOf("✅");
+					if (idx === -1) return;
+					const before = document.createTextNode(text.slice(0, idx));
+					const span = document.createElement("span");
+					span.className = "checksorted-date";
+					span.textContent = text.slice(idx);
+					node.parentNode!.replaceChild(span, node);
+					span.parentNode!.insertBefore(before, span);
+				});
+			});
+		});
 		this.updateStatusBar();
 		this.setupAutoMove();
 	}
@@ -603,6 +620,54 @@ class DeleteTaskWidget extends WidgetType {
 	ignoreEvent(): boolean {
 		return true;
 	}
+}
+
+// Editor extension that marks the "✅ <date>" stamp on completed lines so CSS
+// can cancel the strikethrough that [x] tasks inherit.
+function dateStampExtension(plugin: CheckSortedPlugin) {
+	const checkedLine = /^\s*[-*+] \[[xX]\] /;
+	const stampMark = Decoration.mark({ class: "checksorted-date" });
+
+	return ViewPlugin.fromClass(
+		class {
+			decorations: DecorationSet;
+
+			constructor(view: EditorView) {
+				this.decorations = this.build(view);
+			}
+
+			update(update: ViewUpdate) {
+				if (update.docChanged || update.viewportChanged) {
+					this.decorations = this.build(update.view);
+				}
+			}
+
+			build(view: EditorView): DecorationSet {
+				const builder = new RangeSetBuilder<Decoration>();
+				if (!plugin.settings.dateStamp) return builder.finish();
+
+				for (const { from, to } of view.visibleRanges) {
+					let pos = from;
+					while (pos <= to) {
+						const line = view.state.doc.lineAt(pos);
+						if (checkedLine.test(line.text)) {
+							const stampIdx = line.text.indexOf("✅");
+							if (stampIdx !== -1) {
+								builder.add(
+									line.from + stampIdx,
+									line.to,
+									stampMark
+								);
+							}
+						}
+						pos = line.to + 1;
+					}
+				}
+				return builder.finish();
+			}
+		},
+		{ decorations: (v) => v.decorations }
+	);
 }
 
 // Editor extension that puts a DeleteTaskWidget at the end of every checkbox line.
