@@ -84,7 +84,9 @@ export default class CheckSortedPlugin extends Plugin {
 				const hits: { node: Text; idx: number }[] = [];
 				let n: Text | null;
 				while ((n = walker.nextNode() as Text | null)) {
-					const idx = (n.textContent ?? "").indexOf("✅");
+					const text = n.textContent ?? "";
+					// Only match the plugin-generated stamp: " ✅ <date>" at end of text
+					const idx = text.search(/ ✅ \S/);
 					if (idx !== -1) hits.push({ node: n, idx });
 				}
 				for (const { node, idx } of hits) {
@@ -669,7 +671,8 @@ function dateStampExtension(plugin: CheckSortedPlugin) {
 					while (pos <= to) {
 						const line = view.state.doc.lineAt(pos);
 						if (checkedLine.test(line.text)) {
-							const stampIdx = line.text.indexOf("✅");
+							// Only match the plugin-generated stamp: " ✅ <date>" at end of line
+							const stampIdx = line.text.search(/ ✅ \S/);
 							if (stampIdx !== -1) {
 								const stampText = line.text.slice(stampIdx);
 								builder.add(
